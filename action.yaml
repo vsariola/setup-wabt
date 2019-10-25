@@ -1,13 +1,13 @@
-name: "setup-wabt"
-description: "Sets up the WebAssembly Binary Toolkit"
+name: setup-wabt
+description: Sets up the WebAssembly Binary Toolkit
 inputs:
-  # who-to-greet:  # id of input
-  #   description: 'Who to greet'
-  #   required: true
-  #   default: 'World'
-outputs:
-  # time: # id of output
-  #   description: 'The time we we greeted you'
+  version:
+    description: wabt version
+    required: false
 runs:
   using: 'node12'
   main: 'main.js'
+author: Noah Anabiik Schwarz
+branding:
+  icon: 'tool'
+  color: 'purple'
