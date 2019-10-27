@@ -32,8 +32,7 @@ function extract(archive, dir) {
   if (PLATFORM.startsWith("win")) {
     return extractZip(archive, dir);
   } else {
-    // TODO: make sure to extract flat
-    return extractTar(archive, dir);
+    return extractTar(archive, dir, "--strip-components=1 -xz");
   }
 }
 
