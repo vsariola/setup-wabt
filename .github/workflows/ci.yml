@@ -11,7 +11,9 @@ jobs:
         os: [ubuntu-latest, windows-latest, macos-latest]
     steps:
       - name: clone repo
-        uses: actions/checkout@v1.0.0
+        uses: actions/checkout@master
+        with:
+          ref: ${{ github.ref }}
       # - name: install node
       #   uses: actions/setup-node@v1.1.2
       # - name: extract branch name
@@ -19,6 +21,6 @@ jobs:
       #   run: echo "##[set-output name=branch;]$(echo ${GITHUB_REF#refs/heads/})"
       #   id: extract_branch
       - name: install wabt
-        uses: chiefbiiko/setup-wabt@${{ github.ref }}
-      - name: run tests
-        run: npm test
+        run: node ./main.js
+      - name: check a tool
+        run: wat2wasm --help
