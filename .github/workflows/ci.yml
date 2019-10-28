@@ -19,6 +19,6 @@ jobs:
         run: echo "##[set-output name=branch;]$(echo ${GITHUB_REF#refs/heads/})"
         id: extract_branch
       - name: install wabt
-        uses: chiefbiiko/setup-wabt@${{ steps.extract_branch.outputs.branch }}
+        uses: chiefbiiko/setup-wabt@${{ jobs.test.steps.extract_branch.outputs.branch }}
       - name: run tests
-        run: npm ./test.ts
+        run: npm test
