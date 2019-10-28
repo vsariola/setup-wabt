@@ -1,0 +1,24 @@
+name: ci
+
+on: [push, pull_request, release]
+
+jobs:
+  test:
+    name: test setup-wabt on ${{ matrix.os }}
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [ubuntu-latest, windows-latest, macos-latest]
+    steps:
+      - name: clone repo
+        uses: actions/checkout@v1.0.0
+      # - name: install node
+      #   uses: actions/setup-node@v1.1.2
+      - name: extract branch name
+        shell: bash
+        run: echo "##[set-output name=branch;]$(echo ${GITHUB_REF#refs/heads/})"
+        id: extract_branch
+      - name: install wabt
+        uses: chiefbiiko/setup-wabt@${{ steps.extract_branch.outputs.branch }}
+      - name: run tests
+        run: npm ./test.ts
