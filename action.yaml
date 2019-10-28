@@ -2,12 +2,12 @@ name: setup-wabt
 description: Sets up the WebAssembly Binary Toolkit
 inputs:
   version:
-    description: wabt version
+    description: Toolkit version, defaults to latest
     required: false
 runs:
-  using: 'node12'
-  main: 'main.js'
+  using: node12
+  main: main.js
 author: Noah Anabiik Schwarz
 branding:
-  icon: 'tool'
-  color: 'purple'
+  icon: tool
+  color: purple

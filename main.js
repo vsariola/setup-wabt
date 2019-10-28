@@ -1,13 +1,26 @@
-const core = require("@actions/core");
-const { downloadTool, extractTar, extractZip } = require("@actions/tool-cache");
+const { addPath, debug, error, getInput, setFailed } = require("@actions/core");
+const { downloadTool: download, extractZip } = require("@actions/tool-cache");
 const latestRelease = require("github-latest-release");
 const { coerce: coerceSemVer, valid: isValidSemVer } = require("semver");
 const { arch, platform } = require("os");
 const { join } = require("path");
+const { exec: _exec } = require("child_process")
 
 const BASE_URL = "https://github.com/WebAssembly/wabt/releases/download/";
 const PLATFORM = platform();
 const ARCH = arch();
+
+let BIN_DIR;
+
+if (PLATFORM.startsWith("win")) {
+  BIN_DIR = join(process.env.USERPROFILE || "C:", ".wabt", "bin");
+} else {
+  BIN_DIR = "/usr/local/bin";
+}
+
+async function exec(cmd) {
+  return new Promise((res, rej) => _exec(cmd, err => err ? rej(err) : res()))
+}
 
 function deriveURL(version) {
   if (PLATFORM.startsWith("win")) {
@@ -20,30 +33,22 @@ function deriveURL(version) {
   }
 }
 
-function deriveBinDir() {
+async function extract(archive, dir) {
   if (PLATFORM.startsWith("win")) {
-    return join(process.env.USERPROFILE || "C:\\", ".wabt", "bin");
+    await extractZip(archive, dir);
   } else {
-    return "/usr/local/bin";
-  }
-}
-
-function extract(archive, dir) {
-  if (PLATFORM.startsWith("win")) {
-    return extractZip(archive, dir);
-  } else {
-    return extractTar(archive, dir, "--strip-components=1 -xz");
+    await exec(`tar --extract --gunzip --strip-components=1 --file="${archive}" --directory="${dir}"`)
   }
 }
 
 async function main() {
-  core.debug(`setup-wabt starting...`);
+  debug(`setup-wabt starting...`);
 
   try {
-    let version = coerceSemVer(core.getInput("version"));
+    let version = coerceSemVer(getInput("version"));
 
     if (!version) {
-      core.debug("deriving the latest wabt version...");
+      debug("deriving the latest wabt version...");
 
       const release = await latestRelease("WebAssembly", "wabt");
 
@@ -51,26 +56,25 @@ async function main() {
     }
 
     if (!isValidSemVer(version)) {
-      return core.setFailed(`${version} is not a valid semver`);
+      return setFailed(`${version} is not a valid semver`);
     }
 
     const url = deriveURL(version);
-    const bdir = deriveBinDir();
 
-    core.debug(`installing wabt from ${url} to ${bdir}...`);
+    debug(`installing wabt from ${url} to ${BIN_DIR}...`);
 
-    const file = await downloadTool(url);
+    const archive = await download(url);
 
-    const xdir = await extract(file, bdir);
-    core.debug('xdir:', xdir)
+    await extract(archive, BIN_DIR);
 
-    core.debug("manipulating the PATH...");
-    core.addPath(xdir);
+    // TODO: only if not in PATH
+    debug("manipulating the PATH...");
+    addPath(BIN_DIR);
 
-    core.debug(`wabt-${version} installation successful`);
+    debug(`wabt-${version} installation successful`);
   } catch (err) {
-    core.error(err.stack);
-    core.setFailed(err.message);
+    error(err.stack);
+    setFailed(err.message);
   }
 }
 
