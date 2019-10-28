@@ -10,12 +10,16 @@ jobs:
       matrix:
         os: [ubuntu-latest, windows-latest, macos-latest]
     steps:
-      - name: clone repo
+      - name: clone repo@${{ github.ref }}
         uses: actions/checkout@v1.0.0
         with:
           ref: ${{ github.ref }}
-      - name: install npm deps
-        run: npm install
+      - name: install node n npm
+        uses: actions/setup-node@v1.1.2
+      - name: audit deps
+        run: npm audit
+      - name: install deps
+        run: npm i
       - name: install wabt
         run: node ./main.js
       - name: check a tool
