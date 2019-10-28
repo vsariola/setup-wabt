@@ -30,7 +30,7 @@ async function extract(archive, dir) {
   if (PLATFORM.startsWith("win")) {
     await extractZip(archive, dir)
   } else {
-    // await exec(`mkdir -p "${dir}"`)
+    await exec(`mkdir -p "${dir}"`)
     await exec(
       `tar --extract --gunzip --verbose --strip-components=1 --file="${archive}" --directory="${dir}"`
     )
