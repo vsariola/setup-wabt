@@ -1,8 +1,8 @@
 name: setup-wabt
-description: Sets up the WebAssembly Binary Toolkit
+description: sets up the WebAssembly Binary Toolkit
 inputs:
   version:
-    description: Toolkit version, defaults to latest
+    description: toolkit version, defaults to latest
     required: false
 runs:
   using: node12

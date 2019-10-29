@@ -1,7 +1,7 @@
 {
   "name": "setup-wabt",
   "version": "0.0.1",
-  "description": "Sets up the WebAssembly Binary Toolkit",
+  "description": "github action that sets up the WebAssembly Binary Toolkit",
   "main": "index.js",
   "scripts": {
     "test": "node ./main.js && wat2wasm --help"

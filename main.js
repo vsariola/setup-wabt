@@ -9,10 +9,24 @@ const { exec: _exec } = require("child_process")
 const BASE_URL = "https://github.com/WebAssembly/wabt/releases/download/"
 const PLATFORM = platform()
 const ARCH = arch()
-const BIN_DIR = join(process.env.HOME, ".wabt", "bin")
+const BIN_DIR = join(process.env.HOME || process.env.USERPROFILE, ".wabt")
 
 function exec(cmd) {
-  return new Promise((res, rej) => _exec(cmd, err => (err ? rej(err) : res())))
+  return new Promise((resolve, reject) => {
+    _exec(cmd, (err, stdout, stderr) => {
+      if (stdout) console.log(stdout)
+      if (stderr) console.error(stderr)
+      err ? reject(err) : resolve()
+    })
+  })
+}
+
+function rm(file) {
+  if (PLATFORM.startsWith("win")) {
+    return exec(`del /f "${file}"`)
+  } else {
+    return exec(`rm -f "${file}"`)
+  }
 }
 
 function dlurl(version) {
@@ -38,6 +52,8 @@ async function extract(archive, dir) {
 }
 
 async function main() {
+  let archive
+  
   try {
     let version = coerceSemVer(getInput("version"))
 
@@ -46,13 +62,15 @@ async function main() {
       version = release.tag_name.replace(/^v/, "")
     }
 
-    const archive = await dltmp(dlurl(version))
+    archive = await dltmp(dlurl(version))
 
     await extract(archive, BIN_DIR)
 
     addPath(BIN_DIR)
   } catch (err) {
-    setFailed(err.message)
+    setFailed(err && err.message ? err.message : "setup_wabt failed")
+  } finally {
+    if (archive) await rm(archive)
   }
 }
 
