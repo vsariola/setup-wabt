@@ -9,28 +9,28 @@ const { exec: _exec } = require("child_process")
 const BASE_URL = "https://github.com/WebAssembly/wabt/releases/download/"
 const PLATFORM = platform()
 const ARCH = arch()
-const BIN_DIR = join(process.env.HOME || process.env.USERPROFILE, ".wabt")
+const IS_WINDOWS = PLATFORM.startsWith("win")
+
+function wabtdir(version) {
+  return join(process.env.HOME || process.env.USERPROFILE, `.wabt_${version}`)
+}
 
 function exec(cmd) {
-  return new Promise((resolve, reject) => {
+  return new Promise((resolve, reject) =>
     _exec(cmd, (err, stdout, stderr) => {
       if (stdout) console.log(stdout)
       if (stderr) console.error(stderr)
       err ? reject(err) : resolve()
     })
-  })
+  )
 }
 
 function rm(file) {
-  if (PLATFORM.startsWith("win")) {
-    return exec(`del /f "${file}"`)
-  } else {
-    return exec(`rm -f "${file}"`)
-  }
+  return exec(IS_WINDOWS ? `del /f "${file}"` : `rm -f "${file}"`)
 }
 
 function dlurl(version) {
-  if (PLATFORM.startsWith("win")) {
+  if (IS_WINDOWS) {
     const os = `win${ARCH.replace(/^x/, "")}`
     return `${BASE_URL}${version}/wabt-${version}-${os}.zip`
   } else if (PLATFORM === "darwin") {
@@ -41,7 +41,7 @@ function dlurl(version) {
 }
 
 async function extract(archive, dir) {
-  if (PLATFORM.startsWith("win")) {
+  if (IS_WINDOWS) {
     await extractZip(archive, dir)
   } else {
     await exec(`mkdir -p "${dir}"`)
@@ -53,7 +53,7 @@ async function extract(archive, dir) {
 
 async function main() {
   let archive
-  
+
   try {
     let version = coerceSemVer(getInput("version"))
 
@@ -62,15 +62,17 @@ async function main() {
       version = release.tag_name.replace(/^v/, "")
     }
 
+    const dir = wabtdir(version)
+
     archive = await dltmp(dlurl(version))
 
-    await extract(archive, BIN_DIR)
+    await extract(archive, dir)
 
-    addPath(BIN_DIR)
+    addPath(dir)
   } catch (err) {
-    setFailed(err && err.message ? err.message : "setup_wabt failed")
+    setFailed((err && err.message) || "setup_wabt failed")
   } finally {
-    if (archive) await rm(archive)
+    await rm(archive)
   }
 }
 
