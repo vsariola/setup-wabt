@@ -11,9 +11,10 @@ Simply use setup-wabt as a step in your workflow.
 ``` yaml
 steps:
   - name: install wabt
-    uses: chiefbiiko/setup-wabt
+    uses: chiefbiiko/setup-wabt@1.0.0
     with:
-      version: 1.0.12 # optional - defaults to latest
+      version: 1.0.12 # optional - defaults to latest wabt version
+    run: wat2wasm --help
 ```
 
 ## License
