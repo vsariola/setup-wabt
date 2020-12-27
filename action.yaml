@@ -6,8 +6,8 @@ inputs:
     required: false
 runs:
   using: node12
-  main: main.js
-author: Noah Anabiik Schwarz
+  main: dist/index.js
+author: Noah Anabiik Schwarz, Veikko Sariola
 branding:
   icon: tool
   color: purple

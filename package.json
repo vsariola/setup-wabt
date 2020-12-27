@@ -1,24 +1,24 @@
 {
   "name": "setup-wabt",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "github action that sets up the WebAssembly Binary Toolkit",
   "main": "index.js",
   "scripts": {
-    "test": "node ./main.js && wat2wasm --help"
+    "test": "node ./dist/index.js && wat2wasm --help"
   },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/chiefbiiko/setup-wabt.git"
   },
   "keywords": [],
-  "author": "Noah Anabiik Schwarz",
+  "author": "Noah Anabiik Schwarz, Veikko Sariola",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/chiefbiiko/setup-wabt/issues"
+    "url": "https://github.com/vsariola/setup-wabt/issues"
   },
-  "homepage": "https://github.com/actions/chiefbiiko/setup-wabt#readme",
+  "homepage": "https://github.com/actions/vsariola/setup-wabt#readme",
   "dependencies": {
-    "@actions/core": "1.2.0",
+    "@actions/core": "1.2.6",
     "@actions/tool-cache": "1.1.2",
     "github-latest-release": "0.1.1",
     "semver": "6.3.0"
